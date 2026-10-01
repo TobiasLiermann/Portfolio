@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cobra RS – Neuaufbau eines Industrie-Roboterarms</title>
+<meta name="description" content="Wiederinbetriebnahme eines Roboterarms aus den 1980er-Jahren: Elektronik, Firmware, Kinematik und autonome Würfelerkennung.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<script>document.documentElement.classList.add('js')</script>
+</head>
+<body class="layout-projekt">
+<a class="skip" href="#inhalt">Zum Inhalt springen</a>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="../">Tobias Liermann <span>◆</span> Portfolio</a>
+    <a class="back" href="../#projekte">Alle Projekte</a>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="toc" aria-label="Inhaltsverzeichnis">
+    <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc-liste">
+      <span class="toc-label">Inhalt</span><span class="toc-current"></span>
+    </button>
+    <ol id="toc-liste" class="toc-liste"></ol>
+  </aside>
+
+  <main id="inhalt" class="main">
+<div class="eyebrow">
+  <span class="tag">Projekt 01</span>
+  <span>Robotik / Embedded</span>
+  <span class="rule"></span>
+  <span>HS Düsseldorf · 2026</span>
+</div>
+
+<div class="plate">
+  <span class="screw bl"></span><span class="screw br"></span>
+  <div class="maker">Sekuria</div>
+  <div class="model">Cobra RS</div>
+  <div class="subject">Knickarmroboter · 5 Achsen + Greifer</div>
+  <div class="plate-rule"></div>
+  <div class="stamps">
+    <span>Baujahr <b>1980er</b></span>
+    <span>Made in <b>Germany</b></span>
+    <span>Eigentum <b>HSD</b></span>
+    <span>Neuaufbau <b>2026</b></span>
+  </div>
+</div>
+
+<p class="lead">
+  Ein Industrie-Roboterarm aus den 1980er-Jahren, dessen Steuerung verloren gegangen war. In einem
+  vierwöchigen Praktikum an der Hochschule Düsseldorf habe ich Elektronik und Software komplett neu aufgebaut.
+  Am Ende <strong>erkannte der Arm Würfel mit einem ToF-Sensor, griff sie und stapelte sie aufeinander</strong>.
+</p>
+
+<section>
+  <h2 id="ausgangslage">Ausgangslage</h2>
+
+  <p>
+    Der Cobra RS ist ein Roboterarm von Sekuria aus den 1980er-Jahren und gehört der
+    Hochschule Düsseldorf. Die Mechanik war vollständig erhalten, die sechs Philips-ID35-Stepper
+    waren noch eingebaut und bereits verkabelt. Die Steuerung fehlte dagegen komplett:
+    kein Treiber, kein Controller und keine Originalunterlagen. Der Arm ließ sich nicht bewegen.
+  </p>
+  <p>
+    Das vierwöchige Praktikum absolvierte ich im Rahmen meiner Berufsausbildung an der Lore-Lorentz-Schule, betreut
+    von Prof. Ralf Beck und Mario Meilchen im Fachbereich Elektro- und Informationstechnik. Das Projekt hatte ich vorher
+    bei einem Besuch an der HSD mit den beiden ausgesucht. Meine Aufgabe war, die Hardware auszuwählen, zu
+    verdrahten und die Firmware selbst zu schreiben, bis sich der Arm wieder bewegt und über
+    verschiedene Schnittstellen steuern lässt. Weil es keine Unterlagen mehr gab, musste ich vieles
+    am Arm selbst nachvollziehen und ausmessen.
+  </p>
+
+  <div class="bildpaar-wrap">
+    <div class="bildpaar">
+      <figure>
+        <img src="bilder/ausgangszustand.webp" alt="Orangefarbener Roboterarm Cobra RS auf einer schwarzen Grundplatte, aus dem Sockel hängen lose Motorkabel, daneben ein Not-Aus-Taster" loading="lazy">
+        <figcaption>Der Cobra RS ohne Steuerung: Die Motorkabel hängen offen aus dem Sockel.</figcaption>
+      </figure>
+      <figure>
+        <img src="bilder/motor-id35.webp" alt="Aufschrift eines Philips-Schrittmotors: Stepping Motor ID35, 9904 112 35014, Step angle 7°30'" loading="lazy">
+        <figcaption>Einer der sechs Philips ID35: 7°30' pro Schritt, also 48 Schritte pro Umdrehung.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2 id="mechanik-verstehen">Mechanik verstehen</h2>
+
+  <p>
+    Bevor ich eine Zeile Kinematik schreiben konnte, musste ich herausfinden, wie der Arm mechanisch
+    funktioniert. Er hat sechs Stepper, aber nur fünf Bewegungsachsen: Der sechste Motor schließt den
+    Greifer, geöffnet wird er von einer Feder.
+  </p>
+
+  <div class="axes">
+    <div class="axis">
+      <span class="j">J1</span>
+      <div class="d"><strong>Basis</strong> <span>– dreht den ganzen Arm</span><span class="role">Yaw · Hochachse</span></div>
+      <span class="mass">Sockel 272 mm</span>
+    </div>
+    <div class="axis">
+      <span class="j">J2</span>
+      <div class="d"><strong>Schulter</strong> <span>– Oberarm</span><span class="role">Pitch</span></div>
+      <span class="mass">L1 = 192 mm</span>
+    </div>
+    <div class="axis">
+      <span class="j">J3</span>
+      <div class="d"><strong>Ellbogen</strong> <span>– Unterarm</span><span class="role">Pitch</span></div>
+      <span class="mass">L2 = 192 mm</span>
+    </div>
+    <div class="axis">
+      <span class="j">J4·5</span>
+      <div class="d"><strong>Handgelenk</strong> <span>– Kegelrad-Differential</span><span class="role">Pitch + Roll</span></div>
+      <span class="mass">L3 = 105 mm</span>
+    </div>
+    <div class="axis">
+      <span class="j">M6</span>
+      <div class="d"><strong>Greifer</strong> <span>– Motor schließt, Feder öffnet</span><span class="role">kein Pose-Freiheitsgrad</span></div>
+      <span class="mass"></span>
+    </div>
+  </div>
+
+  <h3>Riemenantrieb und entkoppelte Achsen</h3>
+  <p>
+    Die Motoren sitzen nicht in den Gelenken, sondern unten am Arm. Die weiter außen liegenden
+    Gelenke werden über Zahnriemen entlang der Armglieder angetrieben. Diese Riemenführung sorgt
+    dafür, dass die Achsen mechanisch entkoppelt sind: Jeder Winkel ist absolut zur Horizontalen
+    definiert und nicht relativ zum vorherigen Glied. Fährt die Schulter, behält die Hand ihre
+    Orientierung.
+  </p>
+  <p>
+    Wie alt die Riemen waren, zeigte sich in der vorletzten Woche: Der Riemen der Schulter zerbröselte,
+    die übrigen waren kurz davor. Wir haben das Profil vermessen (T5), und als am Montag darauf der
+    Ersatz kam, habe ich den Arm auseinandergebaut und die Riemen getauscht.
+  </p>
+  <figure class="hoch">
+    <img src="bilder/riemen-oberarm.webp" alt="Blick in den geöffneten Oberarm: mehrere Zahnriemen laufen parallel von großen Riemenscheiben im Sockel nach oben" loading="lazy">
+    <figcaption>Blick in den geöffneten Oberarm: Die Zahnriemen laufen von den Riemenscheiben an der Schulter nach oben zu den äußeren Gelenken.</figcaption>
+  </figure>
+
+  <h3>Differential-Handgelenk</h3>
+  <p>
+    Pitch und Roll der Hand erzeugen beide Handgelenksmotoren gemeinsam über ein
+    Kegelrad-Differential. Drehen beide gleichsinnig, entsteht reiner Pitch, drehen sie gegenläufig,
+    reiner Roll. Die Firmware rechnet deshalb aus Pitch und Roll erst die beiden Motorwinkel aus:
+  </p>
+  <div class="formel">
+    θ<sub>M4</sub> = Pitch + Roll<br>
+    θ<sub>M5</sub> = Pitch − Roll
+    <span class="hinweis">Vorzeichen empirisch festgelegt</span>
+  </div>
+  <p>
+    Die Vorzeichen habe ich am Arm ausprobiert, weil sie von Einbaurichtung und Verdrahtung abhängen.
+    Einen freien Yaw der Hand gibt es nicht, der kommt nur über die Drehung der Basis.
+  </p>
+
+  <figure class="hoch">
+    <img src="bilder/handgelenk.webp" alt="Handgelenk des Cobra RS mit sichtbaren Kegelrädern über dem geöffneten Greifer" loading="lazy">
+    <figcaption>Das Handgelenk: Zwei Motoren erzeugen über Kegelräder gemeinsam Pitch und Roll.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2 id="hardware">Hardware</h2>
+
+  <div class="tabelle">
+    <table class="daten">
+      <tr><th>Controller</th><td>Waveshare ESP32-P4-ETH, kabelgebundenes Ethernet</td></tr>
+      <tr><th>Treiberboard</th><td>Stepperboard für den Odroid M1, verteilt die Versorgung an alle Treiber</td></tr>
+      <tr><th>Treiber</th><td>6× TMC2209, STEP/DIR + UART</td></tr>
+      <tr><th>Motoren</th><td>Philips ID35, 12 V, 7,5°/Schritt (48 Schritte/U), bipolar betrieben</td></tr>
+      <tr><th>Versorgung</th><td><span class="mono">18 V</span></td></tr>
+      <tr><th>Microstepping</th><td><span class="mono">16</span> → 768 Microsteps/U</td></tr>
+      <tr><th>Homing</th><td>optischer Reflexsensor (CNY70/TCRT5000-Typ) pro Gelenk</td></tr>
+      <tr><th>Umgebungssensor</th><td>VL53L1X ToF-Sensor an der Hand, I²C</td></tr>
+    </table>
+  </div>
+
+  <p>
+    Als Controller dient ein ESP32-P4-ETH. Kabelgebundenes Ethernet statt WLAN war ein Wunsch
+    der Hochschule. Die sechs TMC2209 sitzen auf einem Stepperboard, das eigentlich für den Odroid M1
+    gebaut ist. Es verteilt die Versorgung an alle Treiber.
+    So musste ich nicht jeden Treiber einzeln anschließen, und die Verkabelung blieb
+    übersichtlich. Über UART lassen sich Motorstrom und Microstepping per Software einstellen.
+  </p>
+  <p>
+    Die ID35 sind 6-Draht-Motoren. Sie waren bereits bipolar über die vier äußeren Adern verkabelt,
+    so konnte ich sie direkt an die TMC2209 anschließen. Versorgt wird alles mit
+    18 V statt der 12 V Nennspannung der Motoren. Die höhere Spannung bringt mehr Leistung und damit
+    flüssigere Bewegungen.
+  </p>
+  <p>
+    Für die Elektronik habe ich in Fusion 360 einen Montagerahmen konstruiert und gedruckt, der auf die
+    Grundplatte des Arms geschraubt wird. Controller, Stepperboard und Steckbrett haben darin
+    jeweils einen festen Platz, sodass alles sauber sitzt und nichts lose auf dem Tisch liegt.
+  </p>
+
+  <div class="bildpaar-wrap">
+    <div class="bildpaar">
+      <figure>
+        <img src="bilder/rahmen-cad.webp" alt="Bildschirm mit Fusion 360: Konstruktion eines flachen Rahmens mit zwei senkrechten Stützen und einer Platte für ein Board" loading="lazy">
+        <figcaption>Der Montagerahmen in Fusion 360.</figcaption>
+      </figure>
+      <figure>
+        <img src="bilder/elektronik.webp" alt="Elektronik auf der Grundplatte: ESP32-P4-Board, Steckbrett und senkrecht montiertes Stepperboard mit blauen Kühlkörpern, verbunden mit vielen bunten Jumperkabeln" loading="lazy">
+        <figcaption>Der gedruckte Rahmen im Einsatz: ESP32-P4 und Stepperboard mit den sechs TMC2209.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2 id="kernentscheidungen">Kernentscheidungen</h2>
+
+  <h3>Schrittgenerierung</h3>
+  <p>
+    Ein Stepper bewegt sich nur, wenn er für jeden Schritt einen Impuls bekommt. Bei 16 Microsteps
+    sind das 768 Impulse pro Motorumdrehung, und die Abstände dazwischen müssen gleichmäßig sein,
+    sonst läuft der Motor unruhig. Die Bibliothek FastAccelStepper erzeugt diese Impulse nicht in
+    Software, sondern über das RMT-Modul des ESP32. Das sind eigene Hardware-Einheiten, die die
+    Pulse selbstständig ausgeben, während der Prozessor etwas anderes erledigt.
+  </p>
+  <p>
+    Geplant war, alle sechs Motoren so anzusteuern. Die Fehlermeldungen zeigten dann aber, dass mir
+    auf dem ESP32-P4 nur vier RMT-Kanäle zur Verfügung standen. Ich habe die Motoren deshalb
+    aufgeteilt: Die Motoren 1 bis 3 und der Greifermotor 6 laufen hardware-getimt über
+    FastAccelStepper. Die beiden Handgelenksmotoren 4 und 5 steuert AccelStepper, das die Pulse in
+    Software in einem eigenen FreeRTOS-Task erzeugt. Das Handgelenk muss weder schnell fahren noch
+    schnell reagieren, deshalb konnte ich dort am ehesten auf die Hardware verzichten. Der Nachteil
+    ist am Arm sichtbar: Die Handgelenksachsen fahren langsamer als die übrigen. Damit der Rest der
+    Firmware nicht wissen muss, welche Bibliothek hinter einem Motor steckt, habe ich beide in
+    gemeinsame Funktionen verpackt.
+  </p>
+  <p>
+    Der ESP32-P4 hat zwei Kerne. Auf Core 0 läuft der Webserver, auf Core 1 die
+    Bewegungssteuerung. So bremst eine Anfrage an das Web-Interface keine laufende Bewegung aus,
+    und umgekehrt blockiert eine Bewegung nicht den Webserver.
+  </p>
+
+  <h3>Treiber-Tuning</h3>
+  <p>
+    Der TMC2209 hat zwei Betriebsarten. StealthChop ist leise, liefert bei höherer Drehzahl aber
+    weniger Drehmoment, SpreadCycle ist lauter und kräftiger. An fast allen Achsen reichte
+    StealthChop. Nur die Schulter, Motor 2, hat Schritte verloren, wenn der restliche Arm nach vorne
+    ausgestreckt war, weil sie dann das meiste Gewicht hält. Für diese Achse schaltet der Treiber
+    deshalb ab einer bestimmten Geschwindigkeit auf SpreadCycle um.
+  </p>
+  <p>
+    Den Laufstrom habe ich auf 240 mA gesetzt, den Wert aus dem Datenblatt des ID35.
+    Im Dauerbetrieb wurden die Motoren dadurch warm. Deshalb senkt der Treiber den Strom im
+    Stillstand auf etwa 30 %.
+  </p>
+
+  <h3>StallGuard nur am Greifer</h3>
+  <p>
+    Der TMC2209 kann über StallGuard erkennen, wann ein Motor blockiert, ohne zusätzlichen Sensor.
+    Die Idee war, damit Kollisionen an den Armachsen zu erkennen. In der Praxis löste aber ständig
+    einer der Motoren aus, fast unberechenbar. Das Problem ist, dass jede Achse je nach Pose
+    unterschiedlich viel Kraft braucht. Ein Schwellwert, der in einer Stellung passt, ist in der
+    nächsten zu empfindlich oder zu unempfindlich. Das für jede Achse und jede Pose zu kalibrieren,
+    wäre im Rahmen des Praktikums zu aufwendig gewesen. Ich habe StallGuard an den Armachsen deshalb
+    abgeschaltet.
+  </p>
+  <p>
+    Am Greifer habe ich StallGuard behalten. Dort stoppt es
+    den Motor, sobald der Widerstand durch den gegriffenen Würfel zu groß wird. Den Schwellwert habe
+    ich gefunden, indem ich den Greifer zuerst ohne StallGuard schließen ließ und dabei die
+    gemessenen Werte mitgelesen habe.
+  </p>
+</section>
+
+<section>
+  <h2 id="funktionen">Funktionen</h2>
+
+  <h3>Homing und Kalibrierung</h3>
+  <p>
+    Ein Stepper weiß nach dem Einschalten nicht, wo er steht. Deshalb sitzt an jedem Gelenk ein
+    optischer Reflexsensor, der auf ein Riemenrad mit einem weißen Streifen schaut. Beim Homing fahren
+    die Achsen 1 bis 6 nacheinander bis zur Kante zwischen Schwarz und Weiß: erst schnell, dann ein
+    Stück zurück und ein zweites Mal langsam, damit der Referenzpunkt genauer wird. Die nötigen
+    Pull-up-Widerstände saßen ursprünglich auf der alten Anschlussplatine, deshalb habe ich auf dem
+    Steckbrett 10-kΩ-Pull-ups auf 3,3 V gesetzt.
+  </p>
+  <figure class="hoch">
+    <img src="bilder/homing-sensor.webp" alt="Kleine Platine mit Reflexsensor und Widerstand, direkt neben einem Zahnriemenrad mit weißem Streifen" loading="lazy">
+    <figcaption>Reflexsensor am Gelenk. Er erkennt die Kante des weißen Streifens auf dem Riemenrad.</figcaption>
+  </figure>
+  <p>
+    Welcher Winkel am Referenzpunkt anliegt, habe ich für Schulter und Ellbogen mit einer
+    Wasserwaagen-App gemessen: 33,5° über der Horizontalen. Das Vorzeichen hatte ich zuerst falsch,
+    gemerkt habe ich es, weil der Arm in die falsche Richtung fuhr.
+  </p>
+
+  <h3>Kinematik</h3>
+  <p>
+    Die Vorwärtskinematik habe ich selbst hergeleitet und programmiert, die inverse Kinematik mit
+    Hilfe von KI gelöst. Für die Position reicht eine 3R-Kinematik aus Basis, Schulter und Ellbogen,
+    die Orientierung der Hand kommt über die Differential-Mischung dazu. Die entkoppelten Achsen
+    machen die Rechnung einfacher: Die Richtung eines Armglieds ergibt sich direkt aus seinem eigenen
+    Winkel und nicht aus der Summe aller vorherigen.
+  </p>
+  <p>
+    Beim Fahren kamen zwei Punkte dazu. Damit der Arm nicht weit ausholt oder eckig fährt, fährt die
+    Achse mit dem weitesten Weg mit voller Geschwindigkeit und die übrigen proportional langsamer,
+    sodass alle gleichzeitig ankommen. Außerdem prüft die Firmware alle Winkel gegen die Achsgrenzen,
+    bevor sich ein Motor bewegt. Ein unerreichbarer Punkt wird übersprungen, statt die Achsen
+    unkontrolliert fahren zu lassen.
+  </p>
+
+  <h3>Web-Interface</h3>
+  <p>
+    Auf dem ESP32 läuft ein Webserver mit einer Steuerseite. Darüber übergebe ich dem Arm eine
+    Tabelle mit Punkten, die er nacheinander abfährt, verfahre einzelne Achsen direkt und sehe die
+    Achswinkel live. Beim direkten Verfahren sendet die Seite alle 200 ms ein Lebenszeichen, bleibt
+    es 500 ms aus, stoppt der Motor. Hinter der Seite liegt eine REST-API, die auch andere Programme
+    nutzen können.
+  </p>
+  <figure>
+    <img src="bilder/web-interface.webp" alt="Laptop-Bildschirm mit der Steuerseite: links eine Tabelle mit vier Wegpunkten (X, Y, Z, Pitch, Roll, Greifer), rechts Buttons für Start, Normal-Position, Kalibrieren, Würfel scannen und Kalibrier-Scan sowie Einstellungen für Geschwindigkeit und Beschleunigung" loading="lazy">
+    <figcaption>Das Web-Interface: links die Wegpunkt-Tabelle, rechts Steuerung und Einstellungen.</figcaption>
+  </figure>
+
+  <h3>ROS2 und digitaler Zwilling</h3>
+  <p>
+    ROS2 habe ich für das 3D-Modell und die Würfelerkennung genutzt. Die Programme laufen auf einem
+    Laptop und holen sich die Daten über dieselbe REST-API wie das Web-Interface. Das war einfacher
+    als micro-ROS auf dem ESP32. Das 3D-Modell habe ich in Fusion 360 selbst konstruiert, die
+    einzelnen Teile als COLLADA (.dae) exportiert, damit rviz2 die Farben darstellt, und in einer
+    URDF-Datei wieder zu einem beweglichen Arm zusammengesetzt. Es bewegt sich live mit dem echten
+    Arm mit. Dafür werden die Winkel umgerechnet, weil die Firmware absolut zur Horizontalen rechnet
+    und das Modell relativ zum vorherigen Glied.
+  </p>
+  <figure class="hoch">
+    <img src="bilder/rviz-zwilling.webp" alt="Laptop mit rviz2, das ein 3D-Modell des Arms in derselben Pose zeigt wie den echten Arm dahinter" loading="lazy">
+    <figcaption>Der digitale Zwilling in rviz2 folgt der Pose des echten Arms.</figcaption>
+  </figure>
+
+  <h3>Würfelerkennung mit dem ToF-Sensor</h3>
+  <p>
+    Am Greifer sitzt in einer selbst gedruckten Halterung ein VL53L1X, ein Time-of-Flight-Sensor,
+    der Abstände über die Laufzeit von Licht misst. Ausgewählt habe ich ihn, weil ich ihn zu Hause
+    hatte und schon aus Interesse damit experimentiert hatte. Sein Messfeld lässt sich in 4×4 Zonen
+    aufteilen. Der Arm fährt vier Punkte über dem Tisch an und nimmt an jedem ein Tiefenbild mit
+    16 Werten auf.
+  </p>
+  <p>
+    Schon der leere, flache Tisch sah darin wie eine Schüssel aus, weil die äußeren Zonen schräg auf
+    den Tisch schauen. Statt das mit Trigonometrie zu korrigieren, was bei den ungenauen Blickwinkeln
+    der Zonen schlecht funktioniert, nimmt der Arm vorher eine Referenz des leeren Tischs auf und
+    zieht sie beim Scan ab. Übrig bleibt nur, was über den Tisch hinausragt. Aus diesen Zonen
+    berechnet ein ROS2-Programm die Position des Würfels, dann fährt der Arm hin, greift und stapelt.
+    Statt der anfangs schwarzen Würfel habe ich weiße verwendet, weil sie das Licht des Sensors
+    besser reflektieren.
+  </p>
+  <div class="bildpaar-wrap">
+    <div class="bildpaar">
+      <figure>
+        <img src="bilder/tof-halterung.webp" alt="Greifer setzt einen weißen Würfel auf einen Turm, darüber am Handgelenk eine schwarze gedruckte Halterung mit der kleinen Sensorplatine" loading="lazy">
+        <figcaption>Der ToF-Sensor in der gedruckten Halterung am Handgelenk, während der Greifer einen Würfel absetzt.</figcaption>
+      </figure>
+      <figure>
+        <img src="bilder/tof-heatmap.webp" alt="Laptop mit einer 4×4-Heatmap, oben in der Mitte blaue und violette Zonen, dahinter der Arm mit offenem Greifer über mehreren Würfeln" loading="lazy">
+        <figcaption>Live-Heatmap der 16 Zonen. Rot ist Tisch, die violetten und blauen Zonen oben in der Mitte zeigen einen Würfel.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2 id="ergebnis">Ergebnis</h2>
+  <p>
+    Am Ende ließ sich der Arm über das Web-Interface steuern, und ein ROS2-Programm auf dem Laptop
+    übernahm die Würfelsuche. Mit dem ToF-Sensor an der Hand fährt der Arm den Tisch ab, erkennt
+    Würfel, bestimmt ihre Position, greift sie und stapelt sie aufeinander. Bei vier Würfeln auf dem
+    Tisch fand er im ersten Durchgang meistens drei, den vierten manchmal im zweiten Durchgang.
+  </p>
+  <figure class="hoch">
+    <img src="bilder/wuerfelturm.webp" alt="Der Cobra RS neben einem Turm aus drei weißen Würfeln, ein vierter Würfel liegt dahinter" loading="lazy">
+    <figcaption>Drei gestapelte Würfel, der vierte liegt noch bereit.</figcaption>
+  </figure>
+  <div class="video">
+    <div class="play"></div>
+    <div><b>Video</b> · Autonomes Erkennen und Stapeln · folgt</div>
+  </div>
+</section>
+
+<section>
+  <h2 id="was-ich-gelernt-habe">Was ich gelernt habe</h2>
+  <p>
+    Am meisten gelernt habe ich, dass Messen und Testen am echten Arm zuverlässiger ist als jedes
+    Durchdenken. Ich ging davon aus, dass nur das Handgelenk entkoppelt ist, hielt den Oberarm für
+    länger als den Unterarm und hatte beim Home-Winkel das Vorzeichen falsch. Aufgedeckt hat das
+    jedes Mal erst das Ausprobieren am Arm. Beim ToF-Sensor war es ähnlich: Eine Referenzaufnahme
+    des leeren Tischs war einfacher und zuverlässiger, als die Verzerrung zu berechnen. Oft ist
+    Kalibrieren einfacher als Berechnen.
+  </p>
+  <p>
+    Wie wichtig ein Not-Aus ist, habe ich beim Fehler in der Werkzeuglänge gemerkt. Durch das
+    falsche Vorzeichen fuhr der Greifer 148 mm tiefer als geplant und damit in den Tisch. Am Arm war
+    zum Glück ein Not-Aus-Taster angeschlossen.
+  </p>
+  <p>
+    Beim nächsten Projekt würde ich am Anfang genauer festlegen, was das Ziel ist und was welche
+    Schnittstelle können soll. Die direkte Steuerung einzelner Achsen kam erst kurz vor Ende des
+    Praktikums dazu. Beim nachträglichen Einbau sperrten sich die neuen Buttons zuerst selbst:
+    „Motor läuft“ und „Programm läuft“ waren ein gemeinsamer Zustand, und die Oberfläche brach die
+    Bewegung nach einer halben Sekunde wieder ab. Erst zwei getrennte Zustände lösten das.
+  </p>
+  <p>
+    Für das Studium nehme ich mit, wie sehr mich Konstruktion interessiert. Das wusste ich
+    eigentlich schon, das Praktikum hat es mir aber wieder gezeigt, beim Montagerahmen, der
+    Sensorhalterung und dem 3D-Modell. Riemen, Übersetzungen und ein Kegelrad-Differential habe ich
+    hier am echten Objekt verstanden statt nur auf dem Papier.
+  </p>
+</section>
+
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer-in">
+    <span><span class="dot">◆</span>&nbsp; Tobias Liermann · Projektportfolio</span>
+    <a href="../#projekte">Alle Projekte</a>
+  </div>
+</footer>
+
+<script src="../nav.js" defer></script>
+</body>
+</html>

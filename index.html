@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tobias Liermann – Projektportfolio</title>
+<meta name="description" content="Technische Projektdokumentationen: Robotik, Embedded, Mechanik.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./style.css">
+<script>document.documentElement.classList.add('js')</script>
+</head>
+<body class="layout-hub">
+<a class="skip" href="#inhalt">Zum Inhalt springen</a>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="./">Tobias Liermann <span>◆</span> Portfolio</a>
+    <a class="back" href="./#projekte">Alle Projekte</a>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="toc" aria-label="Inhaltsverzeichnis">
+    <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc-liste">
+      <span class="toc-label">Inhalt</span><span class="toc-current"></span>
+    </button>
+    <ol id="toc-liste" class="toc-liste"></ol>
+  </aside>
+
+  <main id="inhalt" class="main">
+<div class="hub-head">
+  <div class="hub-kicker">Projektportfolio</div>
+  <h1 class="hub-name">Tobias Liermann</h1>
+  <div class="hub-rolle">Mechatronik · Robotik · Embedded</div>
+
+  <p class="lead">
+    Ich mache an der Lore-Lorentz-Schule mein Abitur zusammen mit einer Ausbildung zum
+    Physikalisch-Technischen Assistenten. Danach möchte ich Maschinenbau studieren. Mein Interesse an
+    Mikrocontrollern hat in der Schule mit dem Arduino angefangen, seitdem bringe ich mir Elektronik
+    und Programmierung über eigene Projekte selbst bei. Mechanik gehört genauso dazu: Viele Teile
+    konstruiere ich in CAD und drucke sie im 3D-Drucker. Hier dokumentiere ich meine Projekte: was ich gebaut habe, welche
+    Entscheidungen ich dabei getroffen habe und was schiefgegangen ist.
+  </p>
+
+  <div class="hub-links">
+    <a class="knopf" href="#projekte"><span class="pfeil">↓</span> Projekte</a>
+  </div>
+</div>
+
+<section id="projekte">
+  <h2 id="projekte">Projekte</h2>
+  <div class="karten">
+    <a class="karte" href="cobra/">
+      <img src="assets/cobra-kachel.webp" alt="Der Cobra RS mit geöffnetem Greifer, davor ein Turm aus gestapelten Würfeln" loading="lazy">
+      <div class="karte-text">
+        <div class="karte-tag">Robotik / Embedded · 2026</div>
+        <h3>Cobra RS</h3>
+        <p>Neuaufbau der Steuerung für einen Industrie-Roboterarm aus den 1980ern, bis hin zum autonomen Stapeln von Würfeln.</p>
+      </div>
+    </a>
+    <div class="karte bald">
+      <div class="platzhalter">Foto · Octopod</div>
+      <div class="karte-text">
+        <div class="karte-tag">Doku folgt</div>
+        <h3>Octopod</h3>
+        <p>Achtbeiniger Laufroboter.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer-in">
+    <span><span class="dot">◆</span>&nbsp; Tobias Liermann · Projektportfolio</span>
+    <a href="./#projekte">Alle Projekte</a>
+  </div>
+</footer>
+
+<script src="./nav.js" defer></script>
+</body>
+</html>
