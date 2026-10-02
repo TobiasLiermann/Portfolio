@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Octopod – Achtbeiniger Laufroboter</title>
+<meta name="description" content="Eigenbau eines achtbeinigen Laufroboters mit 24 Servos: Konstruktion in Fusion 360, 3D-Druck in PETG, Elektronik mit ESP32.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<script>document.documentElement.classList.add('js')</script>
+</head>
+<body class="layout-projekt akzent-blau">
+<a class="skip" href="#inhalt">Zum Inhalt springen</a>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="../">Tobias Liermann <span>◆</span> Portfolio</a>
+    <a class="back" href="../#projekte">Alle Projekte</a>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="toc" aria-label="Inhaltsverzeichnis">
+    <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc-liste">
+      <span class="toc-label">Inhalt</span><span class="toc-current"></span>
+    </button>
+    <ol id="toc-liste" class="toc-liste"></ol>
+  </aside>
+
+  <main id="inhalt" class="main">
+<div class="eyebrow">
+  <span class="tag">Projekt 02</span>
+  <span>Robotik / Konstruktion</span>
+  <span class="rule"></span>
+  <span>Eigenes Projekt · seit 2025</span>
+</div>
+
+<div class="plate">
+  <span class="screw bl"></span><span class="screw br"></span>
+  <div class="maker">Eigenbau</div>
+  <div class="model">Octopod</div>
+  <div class="subject">Laufroboter · 8 Beine · 24 Servos</div>
+  <div class="plate-rule"></div>
+  <div class="stamps">
+    <span>Stand <b>V0.2</b></span>
+    <span>Material <b>PETG</b></span>
+    <span>Controller <b>ESP32-S3</b></span>
+    <span>Start <b>2025</b></span>
+  </div>
+</div>
+
+<p class="lead">
+  Ein achtbeiniger Laufroboter, den ich komplett selbst konstruiert, gedruckt und verkabelt habe.
+  Jedes Bein hat drei Servos, insgesamt sind es 24. Der aktuelle Stand V0.2 <strong>steht ohne Akku
+  auf eigenen Beinen</strong>. Das große Ziel ist, irgendwann eine Treppe hochzusteigen.
+</p>
+
+<section>
+  <h2 id="ausgangslage">Ausgangslage</h2>
+  <p>
+    Angefangen hat es mit einem Bausatz für einen Laufroboter, dem Maker Kit Bionic von fischertechnik,
+    den ich interessant fand. Für 170 € kaufen wollte ich ihn aber nicht. Stattdessen habe ich mir
+    überlegt, ob ich so etwas günstiger selbst bauen kann, und es dabei gleich besser machen.
+  </p>
+  <p>
+    Aus einem Brainstorming wurde eine Wunschliste: acht statt vier Beine, also ein Octopod, mit
+    jeweils drei Servos pro Bein. Dazu ein Gimbal aus zwei Motoren, der einen Time-of-Flight-Sensor
+    und einen Ultraschallsensor schwenkt. Der Ultraschallsensor soll auch Hindernisse aus Glas
+    erkennen. Gesteuert werden sollte alles von einem günstigen ESP32.
+  </p>
+  <p>
+    Mit dem Gimbal wollte ich die Umgebung abtasten und eine grobe 2D-Karte erstellen. Geplant war
+    dafür zuerst ein VL53L0X. Dann habe ich den VL53L1X kennengelernt, der mehr Daten liefert,
+    inzwischen würde ich einen VL53L8CX nehmen.
+  </p>
+</section>
+
+<section>
+  <h2 id="teileauswahl">Teileauswahl</h2>
+  <p>
+    Weil Geld sparen einer der Hauptgründe für das Projekt war, habe ich mit Google und KI recherchiert,
+    welche Bauteile günstig auf Plattformen wie AliExpress zu bekommen sind und trotzdem gut
+    dokumentiert sind.
+  </p>
+
+  <div class="tabelle">
+    <table class="daten">
+      <tr><th>Controller</th><td>ESP32-S3</td></tr>
+      <tr><th>Servos</th><td>16× MG90S (Hüfte und Unterschenkel), 8× MG996R (Oberschenkel)</td></tr>
+      <tr><th>Servotreiber</th><td>2× PCA9685PW, I²C</td></tr>
+      <tr><th>Versorgung</th><td>3S-LiPo, 5200 mAh, <span class="mono">~11,1 V</span> → Step-down auf <span class="mono">5 V</span></td></tr>
+      <tr><th>Absicherung</th><td>KFZ-Sicherung <span class="mono">15 A</span></td></tr>
+      <tr><th>Strommessung</th><td>INA226 mit Shunt</td></tr>
+      <tr><th>Sensoren</th><td>2× VL53L1X (ToF), HC-SR04 (Ultraschall), MPU-9250 (IMU)</td></tr>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2 id="erster-prototyp-v0-1">Erster Prototyp V0.1</h2>
+  <p>
+    Bevor ich die achtbeinige Version gebaut habe, habe ich eine leichtere Version mit vier Beinen und
+    zwei Servos pro Bein getestet. Damit wollte ich die Servos, die Treiberboards und die Stabilität
+    der Drucke ausprobieren.
+  </p>
+  <div class="bildpaar-wrap">
+    <div class="bildpaar">
+      <figure>
+        <img src="bilder/prototyp-erster-test.webp" alt="Kleiner vierbeiniger Roboter mit Steckbrett und vielen Servokabeln auf einem Schreibtisch" loading="lazy">
+        <figcaption>Erste Tests mit V0.1 im August 2025.</figcaption>
+      </figure>
+      <figure>
+        <img src="bilder/prototyp-v01.webp" alt="Schwarze gedruckte Platte mit vier Beinen aus je zwei Servos" loading="lazy">
+        <figcaption>V0.1 im September 2025: gedruckte Platte, vier Beine mit je zwei Servos.</figcaption>
+      </figure>
+    </div>
+  </div>
+  <p>
+    Der Prototyp hat schnell gezeigt, was nicht funktioniert. Mit vier Beinen war er bei Weitem nicht
+    stabil genug, und die Elektronikbauteile rutschten aus den Vertiefungen, in die ich sie gesteckt
+    hatte. Daraus habe ich zwei Dinge mitgenommen: Vier Beine reichen nicht, und Bauteile halte ich
+    besser mit Stiften als mit Vertiefungen.
+  </p>
+</section>
+
+<section>
+  <h2 id="konstruktion-und-druck">Konstruktion und Druck</h2>
+  <p>
+    Mit CAD habe ich in der Schule in Fusion 360 angefangen und es mir danach selbst weiter
+    beigebracht. Der Octopod war das erste Projekt, bei dem ich das wirklich angewendet habe. Die
+    Grundplatte hat acht Anschlüsse für die Beine, die Module darauf habe ich zuerst als Platzhalter
+    eingezeichnet.
+  </p>
+  <figure>
+    <img src="bilder/cad-grundplatte.webp" alt="Fusion 360 mit der Grundplatte des Octopod, darauf Quader als Platzhalter für die Module" loading="lazy">
+    <figcaption>Die Grundplatte in Fusion 360, die Quader stehen für die einzelnen Module.</figcaption>
+  </figure>
+  <p>
+    Einige Teile habe ich mit Dreiecksstreben konstruiert, damit sie stabil bleiben, aber wenig wiegen.
+    Der Unterschenkel ist so etwa 18 cm lang. Beim nächsten Mal würde ich noch mehr Teile so aufbauen,
+    damit der Octopod insgesamt leichter wird.
+  </p>
+  <div class="bildpaar-wrap">
+    <div class="bildpaar">
+      <figure>
+        <img src="bilder/unterschenkel.webp" alt="Gedruckter schwarzer Unterschenkel mit Dreiecks-Fachwerk" loading="lazy">
+        <figcaption>Der Unterschenkel, etwa 18 cm lang, als Fachwerk aus Dreiecken.</figcaption>
+      </figure>
+      <figure>
+        <img src="bilder/grundplatte-rand.webp" alt="Gedruckte Hälfte der Grundplatte mit Aussparungen und Rand" loading="lazy">
+        <figcaption>Ein Teil der gedruckten Grundplatte.</figcaption>
+      </figure>
+    </div>
+  </div>
+  <p>
+    Gedruckt habe ich auf einem Ender 3 V2, den ich gebraucht geschenkt bekommen habe, weil er nur noch
+    halb funktionierte. Ich habe die defekte Düse am Extruder repariert und das Druckbett neu
+    nivelliert. Danach druckte er PETG ohne Probleme. PETG habe ich gewählt, weil es stabil und
+    günstig ist und beim Drucken vergleichsweise wenig Dämpfe abgibt.
+  </p>
+  <figure class="hoch">
+    <img src="bilder/druck-ender3.webp" alt="Ender 3 V2 druckt eine schwarze Platte" loading="lazy">
+    <figcaption>Der Ender 3 V2 druckt den vorderen Teil der Grundplatte.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2 id="aufbau-v0-2">Aufbau V0.2</h2>
+  <p>
+    Den aktuellen Stand nenne ich V0.2 und weiter Prototyp, weil in der fertigen Version noch einiges
+    dazukommen soll. Jedes Teil habe ich selbst konstruiert, gedruckt und so oft überarbeitet, bis
+    alles zusammenpasste. Ohne das Gewicht des Akkus steht der Octopod, wenn er genug Halt hat, zum
+    Beispiel auf einem Teppich.
+  </p>
+  <figure>
+    <img src="bilder/v02-stehend.webp" alt="Der Octopod steht auf acht schwarzen Fachwerk-Beinen auf einem hellen Teppich" loading="lazy">
+    <figcaption>Der Octopod V0.2 steht auf einem Teppich.</figcaption>
+  </figure>
+  <p>
+    Die Grundplatte ist 40 cm lang und etwa 20 cm breit. Sie besteht aus einer vorderen und einer
+    hinteren Hälfte, die über kleine, verschraubte Verbindungsteile zusammengehalten werden. Jedes
+    Bein besteht aus drei Teilen mit je einem Servo: Ein MG90S dreht die Hüfte (Coxa) nach vorn und
+    hinten, ein stärkerer MG996R hebt und senkt den Oberschenkel (Femur), weil dort das meiste Gewicht
+    hängt, und ein weiterer MG90S knickt den Unterschenkel (Tibia).
+  </p>
+  <div class="bildpaar-wrap">
+    <div class="bildpaar">
+      <figure>
+        <img src="bilder/verbindungen.webp" alt="Verschraubte Verbindungsteile zwischen vorderer und hinterer Plattenhälfte, umgeben von Kabeln" loading="lazy">
+        <figcaption>Die Verbindungen zwischen vorderer und hinterer Hälfte.</figcaption>
+      </figure>
+      <figure>
+        <img src="bilder/bein.webp" alt="Ein Bein mit drei Servos und Fachwerk-Unterschenkel" loading="lazy">
+        <figcaption>Ein Bein: Hüfte, Oberschenkel und Unterschenkel mit je einem Servo.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2 id="elektrik">Elektrik</h2>
+  <p>
+    Die Energie kommt aus einem 3S-LiPo-Akku mit 5200 mAh und etwa 11,1 V. Der Pluspol läuft zuerst
+    über eine KFZ-Sicherung, die bei mehr als 15 A auslöst und so einen Kurzschluss absichert. Danach
+    folgt ein Shunt, über dem der INA226 den Spannungsabfall misst und daraus Strom und Spannung
+    berechnet. Ein Step-down-Modul setzt die Spannung anschließend auf 5 V herunter, von dort wird sie
+    auf die beiden Servotreiber und den ESP32 verteilt.
+  </p>
+  <div class="bildpaar-wrap">
+    <div class="bildpaar">
+      <figure>
+        <img src="bilder/draufsicht.webp" alt="Draufsicht auf die Grundplatte mit Step-down-Modul, Steckbrettern, Servotreibern und vielen Kabeln" loading="lazy">
+        <figcaption>Draufsicht auf die Elektronik.</figcaption>
+      </figure>
+      <figure>
+        <img src="bilder/sicherung-shunt.webp" alt="Kupferner Shunt mit Schraubanschlüssen und rotem Kabel neben einem kleinen Messmodul" loading="lazy">
+        <figcaption>Shunt für die Strommessung mit dem INA226.</figcaption>
+      </figure>
+    </div>
+  </div>
+  <p>
+    Auf dem Steckbrett nutze ich eine der beiden Plus-/Minus-Schienen, um die Versorgung an die
+    Servotreiber und Sensoren zu verteilen. Die andere führt die I²C-Leitungen SCL und SDA, denn
+    die beiden Servotreiber, der INA226 und die IMU MPU-9250 sprechen alle per I²C mit dem ESP32.
+    Die Servos laufen direkt mit den 5 V aus dem Step-down.
+  </p>
+</section>
+
+<section>
+  <h2 id="probleme-und-verbesserungen">Probleme und Verbesserungen</h2>
+  <p>
+    Sobald der Octopod stand, mit und ohne Akku, bogen sich die Gelenkhalter unter der Last. Die Kraft,
+    die dort wirkt, hatte ich beim Konstruieren unterschätzt. Die Verbindungen gaben so stark nach,
+    dass der MG996R gar nicht richtig zum Arbeiten kam: Bevor der Servo an sein Limit gekommen wäre,
+    wären vermutlich die Verbindungen gebrochen.
+  </p>
+  <figure class="hoch">
+    <img src="bilder/gelenk-biegt.webp" alt="Gelenkhalter mit MG996R, der sich unter Last verbiegt" loading="lazy">
+    <figcaption>Der Gelenkhalter biegt sich unter der Last.</figcaption>
+  </figure>
+  <p>
+    Einen Teil davon habe ich schon verbessert. Anfangs waren die Schrauben direkt ins PETG gedreht.
+    Inzwischen gehen sie durch das PETG hindurch und werden auf der anderen Seite mit einer Mutter
+    gekontert. Dadurch löst sich nichts mehr, und die Verbindungen sind deutlich stabiler. Trotzdem
+    biegen sich die Servohörner noch stark, und die Getriebe der MG90S geben nach. Das eigentliche
+    Problem ist, dass die Servos selbst die Gelenkachse bilden und die ganze Last tragen.
+  </p>
+  <p>
+    Für die nächste Version plane ich deshalb Kugellager parallel zu den Servos, ober- oder unterhalb
+    des Gelenks, die die Verbindung führen und abstützen. Der Servo soll das Gelenk dann nur noch
+    antreiben. Zusätzlich überlege ich, an jeder Achse einen MG996R statt der schwächeren MG90S
+    einzusetzen.
+  </p>
+  <p>
+    Die Software kann bisher die Beine bewegen und den INA226 auslesen. Schwierig war dabei vor
+    allem, dass fast jeder Servo in eine andere Richtung eingebaut ist. Gelöst habe ich das mit einer
+    Tabelle, in der für jeden Servo die Drehrichtung als Vorzeichen hinterlegt ist.
+  </p>
+</section>
+
+<section>
+  <h2 id="stand-und-naechste-schritte">Stand und nächste Schritte</h2>
+  <p>
+    Der Octopod ist ein laufendes Projekt. Zuerst muss er richtig laufen können. Danach soll er mit
+    dem ToF- und dem Ultraschallsensor seine Umgebung abtasten, Hindernisse, Türen und Treppen erkennen und eine Karte des Raums anlegen.
+    Über eine Webseite will ich ihn steuern, Parameter wie die Geschwindigkeit ändern und die
+    Sensordaten ansehen. Ein kleines OLED-Display soll den Akkustand anzeigen. Mit der IMU und dem
+    INA226 möchte ich die Beine kalibrieren, wenn sie sich verstellt haben, und ein eigener 6-V-Kreis
+    für die Servos soll mehr Kraft liefern.
+  </p>
+  <p>
+    Das große Ziel ist, dass der Octopod eine Treppe hochsteigt. Vielleicht klappt das nicht, aber
+    ich werde es versuchen.
+  </p>
+</section>
+
+<section>
+  <h2 id="was-ich-gelernt-habe">Was ich gelernt habe</h2>
+  <p>
+    Die wichtigste Lehre aus V0.2 ist, dass ich vorher abschätzen muss, welche Last auf einem Teil
+    liegt, und dann ausprobieren muss, ob es sie aushält. Beim Konstruieren der Gelenkhalter hatte ich
+    die Last gar nicht bedacht, erst am stehenden Roboter hat sich gezeigt, dass sie nachgeben.
+  </p>
+  <p>
+    Bei Verbindungen im 3D-Druck hat sich eine einfache Lösung am besten bewährt: eine Schraube ganz
+    durch das Bauteil und auf der anderen Seite eine Mutter. Das hält fest und ist einfacher als
+    eingeschmolzene Gewindeeinsätze.
+  </p>
+  <p>
+    Außerdem würde ich beim nächsten Mal mehr mit Strukturen arbeiten. Beim Unterschenkel habe ich
+    schon Dreiecke verwendet, die Grundplatte ist aber noch massiv. Mit einer Wabenstruktur aus
+    Löchern hätte ich dort wahrscheinlich einiges an Gewicht gespart.
+  </p>
+</section>
+
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer-in">
+    <span><span class="dot">◆</span>&nbsp; Tobias Liermann · Projektportfolio</span>
+    <a href="../#projekte">Alle Projekte</a>
+  </div>
+</footer>
+
+<script src="../nav.js" defer></script>
+</body>
+</html>

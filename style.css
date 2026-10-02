@@ -9,6 +9,7 @@
   --line:#312B20;
   --orange:#EE6C1A;
   --orange-deep:#B84E10;
+  --akzent-rgb:238,108,26; /* = --orange als RGB für transparente Töne */
   --steel:#6E8391;
 
   --display:"Oswald",Impact,"Arial Narrow",sans-serif;
@@ -17,6 +18,9 @@
 
   --topbar-h:52px;
 }
+/* Akzentfarbe pro Projekt: <!-- akzent: blau --> in der Seite. Die Variablen heißen weiter --orange,
+   damit der Rest des CSS unverändert bleibt. */
+.akzent-blau{--orange:#3D9BE0;--orange-deep:#1E6AA8;--akzent-rgb:61,155,224}
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;scroll-padding-top:calc(var(--topbar-h) + 24px)}
 body{
@@ -116,7 +120,7 @@ a:hover{color:#FF8A3D}
 .model{
   font-family:var(--display);font-weight:700;font-size:clamp(56px,11vw,112px);line-height:.86;
   letter-spacing:.01em;text-transform:uppercase;color:var(--orange);
-  text-shadow:0 2px 0 var(--orange-deep),0 3px 14px rgba(238,108,26,.25);
+  text-shadow:0 2px 0 var(--orange-deep),0 3px 14px rgba(var(--akzent-rgb),.25);
 }
 .subject{font-family:var(--display);font-weight:500;font-size:clamp(15px,3vw,20px);letter-spacing:.22em;text-transform:uppercase;margin-top:14px}
 .plate-rule{height:2px;width:70%;background:linear-gradient(90deg,var(--orange),transparent);margin:22px 0 20px}
@@ -196,7 +200,7 @@ figure.hoch{max-width:420px}
 .bildpaar-wrap{margin:32px 0}
 
 .video{aspect-ratio:16/9;flex-direction:column;gap:14px;border-color:var(--orange-deep);
-  background:repeating-linear-gradient(45deg,rgba(238,108,26,.04) 0 12px,transparent 12px 24px),var(--bg-raise)}
+  background:repeating-linear-gradient(45deg,rgba(var(--akzent-rgb),.04) 0 12px,transparent 12px 24px),var(--bg-raise)}
 .video b{color:var(--ink);font-weight:500}
 .play{width:62px;height:62px;border-radius:50%;border:2px solid var(--orange);display:grid;place-items:center}
 .play::after{content:"";margin-left:5px;border-left:19px solid var(--orange);border-top:12px solid transparent;border-bottom:12px solid transparent}
@@ -206,7 +210,7 @@ figure.hoch{max-width:420px}
 /* ---------- Entwurfs-Markierung (vor Veröffentlichung entfernen) ---------- */
 .todo{
   margin:18px 0;padding:12px 16px;border:1px dashed #8A6A2A;border-radius:3px;
-  background:rgba(238,108,26,.06);
+  background:rgba(var(--akzent-rgb),.06);
   font-family:var(--mono);font-size:12.5px;line-height:1.55;color:#D9B98A;max-width:none;
 }
 .todo::before{content:"TODO · ";color:var(--orange);letter-spacing:.14em}
