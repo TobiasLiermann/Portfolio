@@ -265,6 +265,7 @@ a.karte:hover .karte-pfeil,a.karte:focus-visible .karte-pfeil{border-color:var(-
 .site-footer a{color:var(--ink-dim);text-decoration:none}
 .site-footer a:hover{color:var(--ink)}
 .site-footer .dot{color:var(--orange)}
+.ki-hinweis{flex-basis:100%;max-width:68ch;font-family:var(--sans);font-size:13px;letter-spacing:0;text-transform:none;line-height:1.55;color:var(--ink-dim)}
 
 /* ---------- Einblenden ---------- */
 .js .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}

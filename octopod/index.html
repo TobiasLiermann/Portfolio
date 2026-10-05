@@ -5,6 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Octopod – Achtbeiniger Laufroboter</title>
 <meta name="description" content="Eigenbau eines achtbeinigen Laufroboters mit 24 Servos: Konstruktion in Fusion 360, 3D-Druck in PETG, Elektronik mit ESP32.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Octopod – Achtbeiniger Laufroboter">
+<meta property="og:description" content="Eigenbau eines achtbeinigen Laufroboters mit 24 Servos: Konstruktion in Fusion 360, 3D-Druck in PETG, Elektronik mit ESP32.">
+<meta property="og:url" content="https://tobiasliermann.github.io/Portfolio/octopod/">
+<meta property="og:image" content="https://tobiasliermann.github.io/Portfolio/assets/og-octopod.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
@@ -62,7 +73,7 @@
   <p>
     Angefangen hat es mit einem Bausatz für einen Laufroboter, dem Maker Kit Bionic von fischertechnik,
     den ich interessant fand. Für 170 € kaufen wollte ich ihn aber nicht. Stattdessen habe ich mir
-    überlegt, ob ich so etwas günstiger selbst bauen kann, und es dabei gleich besser machen.
+    überlegt, ob ich so etwas günstiger selbst bauen und dabei gleich besser machen kann.
   </p>
   <p>
     Aus einem Brainstorming wurde eine Wunschliste: acht statt vier Beine, also ein Octopod, mit
@@ -81,8 +92,7 @@
   <h2 id="teileauswahl">Teileauswahl</h2>
   <p>
     Weil Geld sparen einer der Hauptgründe für das Projekt war, habe ich mit Google und KI recherchiert,
-    welche Bauteile günstig auf Plattformen wie AliExpress zu bekommen sind und trotzdem gut
-    dokumentiert sind.
+    welche Bauteile günstig auf Plattformen wie AliExpress zu bekommen und trotzdem gut dokumentiert sind.
   </p>
 
   <div class="tabelle">
@@ -101,7 +111,7 @@
 <section>
   <h2 id="erster-prototyp-v0-1">Erster Prototyp V0.1</h2>
   <p>
-    Bevor ich die achtbeinige Version gebaut habe, habe ich eine leichtere Version mit vier Beinen und
+    Vor der achtbeinigen Version habe ich eine leichtere Version mit vier Beinen und
     zwei Servos pro Bein getestet. Damit wollte ich die Servos, die Treiberboards und die Stabilität
     der Drucke ausprobieren.
   </p>
@@ -139,7 +149,7 @@
   </figure>
   <p>
     Einige Teile habe ich mit Dreiecksstreben konstruiert, damit sie stabil bleiben, aber wenig wiegen.
-    Der Unterschenkel ist so etwa 18 cm lang. Beim nächsten Mal würde ich noch mehr Teile so aufbauen,
+    Der Unterschenkel ist etwa 18 cm lang. Beim nächsten Mal würde ich noch mehr Teile so aufbauen,
     damit der Octopod insgesamt leichter wird.
   </p>
   <div class="bildpaar-wrap">
@@ -169,7 +179,7 @@
 <section>
   <h2 id="aufbau-v0-2">Aufbau V0.2</h2>
   <p>
-    Den aktuellen Stand nenne ich V0.2 und weiter Prototyp, weil in der fertigen Version noch einiges
+    Den aktuellen Stand nenne ich V0.2 und weiterhin einen Prototyp, weil in der fertigen Version noch einiges
     dazukommen soll. Jedes Teil habe ich selbst konstruiert, gedruckt und so oft überarbeitet, bis
     alles zusammenpasste. Ohne das Gewicht des Akkus steht der Octopod, wenn er genug Halt hat, zum
     Beispiel auf einem Teppich.
@@ -231,7 +241,7 @@
 <section>
   <h2 id="probleme-und-verbesserungen">Probleme und Verbesserungen</h2>
   <p>
-    Sobald der Octopod stand, mit und ohne Akku, bogen sich die Gelenkhalter unter der Last. Die Kraft,
+    Schon beim Hinstellen, mit und ohne Akku, bogen sich die Gelenkhalter unter der Last. Die Kraft,
     die dort wirkt, hatte ich beim Konstruieren unterschätzt. Die Verbindungen gaben so stark nach,
     dass der MG996R gar nicht richtig zum Arbeiten kam: Bevor der Servo an sein Limit gekommen wäre,
     wären vermutlich die Verbindungen gebrochen.
@@ -263,7 +273,9 @@
 <section>
   <h2 id="stand-und-naechste-schritte">Stand und nächste Schritte</h2>
   <p>
-    Der Octopod ist ein laufendes Projekt. Zuerst muss er richtig laufen können. Danach soll er mit
+    Der Octopod ist ein laufendes Projekt. Im Juli 2026 habe ich die ersten Laufversuche gemacht,
+    einmal mit den alten Verbindungen und einmal mit Schraube und Mutter. Weiter als etwa 5 cm kam er
+    dabei noch nicht. Zuerst muss er also richtig laufen können. Danach soll er mit
     dem ToF- und dem Ultraschallsensor seine Umgebung abtasten, Hindernisse, Türen und Treppen erkennen und eine Karte des Raums anlegen.
     Über eine Webseite will ich ihn steuern, Parameter wie die Geschwindigkeit ändern und die
     Sensordaten ansehen. Ein kleines OLED-Display soll den Akkustand anzeigen. Mit der IMU und dem
@@ -302,6 +314,10 @@
   <div class="site-footer-in">
     <span><span class="dot">◆</span>&nbsp; Tobias Liermann · Projektportfolio</span>
     <a href="../#projekte">Alle Projekte</a>
+    <p class="ki-hinweis">
+      Die Projekte, Fotos und technischen Inhalte stammen von mir. Die Webseite (Design und Code) und
+      die Texte sind mit KI-Unterstützung entstanden und von mir geprüft.
+    </p>
   </div>
 </footer>
 
