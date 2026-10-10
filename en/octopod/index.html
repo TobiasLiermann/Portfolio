@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Octopod – Eight-Legged Walking Robot</title>
+<meta name="description" content="Self-built eight-legged walking robot with 24 servos: designed in Fusion 360, 3D printed in PETG, electronics with an ESP32.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Octopod – Eight-Legged Walking Robot">
+<meta property="og:description" content="Self-built eight-legged walking robot with 24 servos: designed in Fusion 360, 3D printed in PETG, electronics with an ESP32.">
+<meta property="og:url" content="https://tobiasliermann.github.io/Portfolio/en/octopod/">
+<meta property="og:image" content="https://tobiasliermann.github.io/Portfolio/assets/og-octopod.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_US">
+<link rel="alternate" hreflang="de" href="https://tobiasliermann.github.io/Portfolio/octopod/">
+<link rel="alternate" hreflang="en" href="https://tobiasliermann.github.io/Portfolio/en/octopod/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../style.css">
+<script>document.documentElement.classList.add('js')</script>
+</head>
+<body class="layout-projekt akzent-blau">
+<a class="skip" href="#inhalt">Skip to content</a>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="../../en/">Tobias Liermann <span>◆</span> Portfolio</a>
+    <nav class="topbar-rechts">
+      <a class="back" href="../../en/#projekte">All projects</a>
+      <span class="sprache"><a href="../../octopod/" hreflang="de" lang="de">DE</a> <span aria-hidden="true">|</span> <b aria-current="true">EN</b></span>
+    </nav>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="toc" aria-label="Table of contents">
+    <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc-liste">
+      <span class="toc-label">Contents</span><span class="toc-current"></span>
+    </button>
+    <ol id="toc-liste" class="toc-liste"></ol>
+  </aside>
+
+  <main id="inhalt" class="main">
+<div class="eyebrow">
+  <span class="tag">Project 02</span>
+  <span>Robotics / Mechanical design</span>
+  <span class="rule"></span>
+  <span>Personal project · since 2025</span>
+</div>
+
+<div class="plate">
+  <span class="screw bl"></span><span class="screw br"></span>
+  <div class="maker">Self-built</div>
+  <div class="model">Octopod</div>
+  <div class="subject">Walking robot · 8 legs · 24 servos</div>
+  <div class="plate-rule"></div>
+  <div class="stamps">
+    <span>Version <b>V0.2</b></span>
+    <span>Material <b>PETG</b></span>
+    <span>Controller <b>ESP32-S3</b></span>
+    <span>Start <b>2025</b></span>
+  </div>
+</div>
+
+<p class="lead">
+  An eight-legged walking robot that I designed, printed and wired completely by myself. Each leg has
+  three servos, 24 in total. There are no building instructions for it: I designed all printed parts
+  myself and kept improving them until everything fit together. The current version V0.2
+  <strong>stands on its own legs without the battery</strong>. The big goal is to make it climb a
+  staircase one day.
+</p>
+
+<figure class="hoch">
+  <div class="video-embed hoch">
+    <iframe src="https://www.youtube-nocookie.com/embed/EVYy0nTdzWQ" title="Octopod V0.2 Showcase" loading="lazy"
+      allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen
+      referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  <figcaption>Leg movement, play in the joints and a walking attempt with the new connections, partly at 2× speed.</figcaption>
+</figure>
+
+<section>
+  <h2 id="starting-point">Starting point</h2>
+  <p>
+    It started with a kit for a walking robot, the Maker Kit Bionic by fischertechnik, which I found
+    interesting. But I did not want to buy it for 170 €. Instead, I thought about whether I could build
+    something similar myself for less money and make it better at the same time.
+  </p>
+  <p>
+    A brainstorming session turned into a wish list: eight legs instead of four, so an octopod, with
+    three servos per leg. On top of that, a gimbal made of two motors that swivels a time-of-flight
+    sensor and an ultrasonic sensor. The ultrasonic sensor should also detect obstacles made of glass.
+    Everything was to be controlled by a cheap ESP32.
+  </p>
+  <p>
+    With the gimbal, I wanted to scan the surroundings and create a rough 2D map. At first I planned to
+    use a VL53L0X for this. Then I got to know the VL53L1X, which delivers more data. Today I would
+    choose a VL53L8CX.
+  </p>
+</section>
+
+<section>
+  <h2 id="choosing-parts">Choosing parts</h2>
+  <p>
+    Because saving money was one of the main reasons for the project, I used Google and AI to research
+    which parts are cheap on platforms like AliExpress and still well documented.
+  </p>
+
+  <div class="tabelle">
+    <table class="daten">
+      <tr><th>Controller</th><td>ESP32-S3</td></tr>
+      <tr><th>Servos</th><td>16× MG90S (hip and lower leg), 8× MG996R (upper leg)</td></tr>
+      <tr><th>Servo drivers</th><td>2× PCA9685PW, I²C</td></tr>
+      <tr><th>Power supply</th><td>3S LiPo, 5200 mAh, <span class="mono">~11.1 V</span> → step-down to <span class="mono">5 V</span></td></tr>
+      <tr><th>Protection</th><td>automotive fuse <span class="mono">15 A</span></td></tr>
+      <tr><th>Current measurement</th><td>INA226 with shunt</td></tr>
+      <tr><th>Sensors</th><td>2× VL53L1X (ToF), HC-SR04 (ultrasonic), MPU-9250 (IMU)</td></tr>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2 id="first-prototype-v0-1">First prototype V0.1</h2>
+  <p>
+    Before the eight-legged version, I tested a lighter version with four legs and two servos per leg.
+    I wanted to try out the servos, the driver boards and how stable the prints are.
+  </p>
+  <div class="bildpaar-wrap">
+    <div class="bildpaar">
+      <figure>
+        <img src="../../octopod/bilder/prototyp-erster-test.webp" alt="Small four-legged robot with a breadboard and many servo cables on a desk" loading="lazy">
+        <figcaption>First tests with V0.1 in August 2025.</figcaption>
+      </figure>
+      <figure>
+        <img src="../../octopod/bilder/prototyp-v01.webp" alt="Black printed plate with four legs made of two servos each" loading="lazy">
+        <figcaption>V0.1 in September 2025: printed plate, four legs with two servos each.</figcaption>
+      </figure>
+    </div>
+  </div>
+  <p>
+    The prototype quickly showed what does not work. With four legs it was far from stable enough, and
+    the electronic parts slid out of the recesses I had put them in. I took two things from this: four
+    legs are not enough, and parts are better held with pins than with recesses.
+  </p>
+</section>
+
+<section>
+  <h2 id="design-and-printing">Design and printing</h2>
+  <p>
+    I started with CAD in Fusion 360 at school and then kept teaching myself. The Octopod was the first
+    project where I really used it. The base plate has eight connection points for the legs. I first
+    drew the modules on it as placeholders.
+  </p>
+  <figure>
+    <img src="../../octopod/bilder/cad-grundplatte.webp" alt="Fusion 360 with the base plate of the Octopod, boxes on it as placeholders for the modules" loading="lazy">
+    <figcaption>The base plate in Fusion 360. The boxes stand for the different modules.</figcaption>
+  </figure>
+  <p>
+    I designed some parts with triangular struts so that they stay stable but weigh little. The lower
+    leg is about 18 cm long. Next time I would build even more parts this way so that the Octopod gets
+    lighter overall.
+  </p>
+  <div class="bildpaar-wrap">
+    <div class="bildpaar">
+      <figure>
+        <img src="../../octopod/bilder/unterschenkel.webp" alt="Printed black lower leg with a triangular truss structure" loading="lazy">
+        <figcaption>The lower leg, about 18 cm long, as a truss made of triangles.</figcaption>
+      </figure>
+      <figure>
+        <img src="../../octopod/bilder/grundplatte-rand.webp" alt="Printed half of the base plate with cut-outs and an edge" loading="lazy">
+        <figcaption>Part of the printed base plate.</figcaption>
+      </figure>
+    </div>
+  </div>
+  <p>
+    I printed everything on an Ender 3 V2 that I was given second-hand because it only half worked. I
+    repaired the broken nozzle on the extruder and levelled the print bed again. After that, it printed
+    PETG without problems. I chose PETG because it is strong and cheap and gives off relatively few
+    fumes while printing.
+  </p>
+  <figure class="hoch">
+    <img src="../../octopod/bilder/druck-ender3.webp" alt="Ender 3 V2 printing a black plate" loading="lazy">
+    <figcaption>The Ender 3 V2 printing the front part of the base plate.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2 id="building-v0-2">Building V0.2</h2>
+  <p>
+    I call the current version V0.2 and still a prototype, because a lot more will be added in the
+    final version. I designed and printed every part myself and reworked it as often as needed until
+    everything fit together. Without the weight of the battery, the Octopod stands if it has enough
+    grip, for example on a carpet.
+  </p>
+  <figure>
+    <img src="../../octopod/bilder/v02-stehend.webp" alt="The Octopod standing on eight black truss legs on a light carpet" loading="lazy">
+    <figcaption>The Octopod V0.2 standing on a carpet.</figcaption>
+  </figure>
+  <p>
+    The base plate is 40 cm long and about 20 cm wide. It consists of a front and a back half, held
+    together by small screwed connection parts. Each leg has three parts with one servo each: an MG90S
+    turns the hip (coxa) forward and backward, a stronger MG996R lifts and lowers the upper leg (femur),
+    because that is where most of the weight hangs, and another MG90S bends the lower leg (tibia).
+  </p>
+  <div class="bildpaar-wrap">
+    <div class="bildpaar">
+      <figure>
+        <img src="../../octopod/bilder/verbindungen.webp" alt="Screwed connection parts between the front and back half of the plate, surrounded by cables" loading="lazy">
+        <figcaption>The connections between the front and back half.</figcaption>
+      </figure>
+      <figure>
+        <img src="../../octopod/bilder/bein.webp" alt="A leg with three servos and a truss lower leg" loading="lazy">
+        <figcaption>One leg: hip, upper leg and lower leg with one servo each.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2 id="electrics">Electrics</h2>
+  <p>
+    The power comes from a 3S LiPo battery with 5200 mAh and about 11.1 V. The positive lead first goes
+    through an automotive fuse that blows above 15 A and protects against short circuits. After that
+    comes a shunt. The INA226 measures the voltage drop across it and calculates current and voltage
+    from it. A step-down module then lowers the voltage to 5 V, and from there it is distributed to the
+    two servo drivers and the ESP32.
+  </p>
+  <div class="bildpaar-wrap">
+    <div class="bildpaar">
+      <figure>
+        <img src="../../octopod/bilder/draufsicht.webp" alt="Top view of the base plate with step-down module, breadboards, servo drivers and many cables" loading="lazy">
+        <figcaption>Top view of the electronics.</figcaption>
+      </figure>
+      <figure>
+        <img src="../../octopod/bilder/sicherung-shunt.webp" alt="Copper shunt with screw terminals and a red cable next to a small measuring module" loading="lazy">
+        <figcaption>Shunt for current measurement with the INA226.</figcaption>
+      </figure>
+    </div>
+  </div>
+  <p>
+    On the breadboard, I use one of the two plus/minus rails to distribute power to the servo drivers
+    and sensors. The other one carries the I²C lines SCL and SDA, because the two servo drivers, the
+    INA226 and the MPU-9250 IMU all talk to the ESP32 over I²C. The servos run directly on the 5 V from
+    the step-down module.
+  </p>
+</section>
+
+<section>
+  <h2 id="problems-and-improvements">Problems and improvements</h2>
+  <p>
+    As soon as I stood the Octopod up, with and without the battery, the joint brackets bent under the
+    load. I had underestimated the force acting there when I designed them. The connections gave way so
+    much that the MG996R could not really do its job: the connections would probably have broken before
+    the servo reached its limit.
+  </p>
+  <figure class="hoch">
+    <img src="../../octopod/bilder/gelenk-biegt.webp" alt="Joint bracket with an MG996R bending under load" loading="lazy">
+    <figcaption>The joint bracket bends under the load.</figcaption>
+  </figure>
+  <p>
+    I have already improved part of this. At first, the screws were screwed directly into the PETG. Now
+    they go all the way through the PETG and are secured with a nut on the other side. Nothing comes
+    loose anymore, and the connections are much more stable. Still, the servo horns bend a lot, and the
+    gears of the MG90S give way. The real problem is that the servos themselves form the joint axis and
+    carry the whole load.
+  </p>
+  <p>
+    For the next version, I am therefore planning ball bearings parallel to the servos, above or below
+    the joint, to guide and support the connection. The servo should then only drive the joint. I am
+    also thinking about using an MG996R on every axis instead of the weaker MG90S.
+  </p>
+  <p>
+    So far, the software can move the legs and read the INA226. The main difficulty was that almost
+    every servo is mounted facing a different direction. I solved this with a table that stores the
+    direction of rotation for each servo as a sign.
+  </p>
+</section>
+
+<section>
+  <h2 id="current-status-and-next-steps">Current status and next steps</h2>
+  <p>
+    The Octopod is an ongoing project. In July 2026, I made the first walking attempts, once with the
+    old connections and once with screws and nuts. It did not get further than about 5 cm. So first it
+    has to learn to walk properly. After that, it should scan its surroundings with the ToF and
+    ultrasonic sensors, detect obstacles, doors and stairs, and create a map of the room. I want to
+    control it through a website, change parameters like the speed and see the sensor data. A small OLED
+    display should show the battery level. With the IMU and the INA226, I want to calibrate the legs
+    when they have shifted, and a separate 6 V circuit for the servos should give them more power.
+  </p>
+  <p>
+    The big goal is for the Octopod to climb a staircase. Maybe it will not work, but I will try.
+  </p>
+</section>
+
+<section>
+  <h2 id="what-i-learned">What I learned</h2>
+  <p>
+    The most important lesson from V0.2 is that I have to estimate beforehand how much load a part has
+    to carry, and then test whether it can handle it. When I designed the joint brackets, I did not
+    think about the load at all. Only the standing robot showed that they give way.
+  </p>
+  <p>
+    For connections in 3D-printed parts, a simple solution worked best: a screw all the way through the
+    part and a nut on the other side. It holds firmly and is easier than melted-in threaded inserts.
+  </p>
+  <p>
+    Next time, I would also make more use of structures. I already used triangles for the lower leg,
+    but the base plate is still solid. With a honeycomb pattern of holes, I would probably have saved
+    quite a lot of weight there.
+  </p>
+</section>
+
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer-in">
+    <span><span class="dot">◆</span>&nbsp; Tobias Liermann · Project portfolio</span>
+    <a href="../../en/#projekte">All projects</a>
+    <p class="ki-hinweis">The projects, photos and technical content are my own. The website (design and code) and the texts were created with the help of AI and checked by me.</p>
+  </div>
+</footer>
+
+<script src="../../nav.js" defer></script>
+</body>
+</html>

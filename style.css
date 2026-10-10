@@ -64,6 +64,10 @@ a:hover{color:#FF8A3D}
 .topbar a:hover{color:var(--ink)}
 .brand span{color:var(--orange)}
 .layout-hub .back{display:none}
+.topbar-rechts{display:flex;align-items:center;gap:22px}
+.sprache{font-family:var(--mono);font-size:12px;letter-spacing:.12em;color:var(--ink-dim)}
+.sprache b{color:var(--orange);font-weight:500}
+.sprache a{padding:4px 2px}
 
 /* ---------- Grundlayout ---------- */
 .shell{

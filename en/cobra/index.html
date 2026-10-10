@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cobra RS – Rebuilding an Industrial Robot Arm</title>
+<meta name="description" content="Bringing a 1980s robot arm back to life: electronics, firmware, kinematics and autonomous cube detection.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Cobra RS – Rebuilding an Industrial Robot Arm">
+<meta property="og:description" content="Bringing a 1980s robot arm back to life: electronics, firmware, kinematics and autonomous cube detection.">
+<meta property="og:url" content="https://tobiasliermann.github.io/Portfolio/en/cobra/">
+<meta property="og:image" content="https://tobiasliermann.github.io/Portfolio/assets/og-cobra.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_US">
+<link rel="alternate" hreflang="de" href="https://tobiasliermann.github.io/Portfolio/cobra/">
+<link rel="alternate" hreflang="en" href="https://tobiasliermann.github.io/Portfolio/en/cobra/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../style.css">
+<script>document.documentElement.classList.add('js')</script>
+</head>
+<body class="layout-projekt akzent-orange">
+<a class="skip" href="#inhalt">Skip to content</a>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="../../en/">Tobias Liermann <span>◆</span> Portfolio</a>
+    <nav class="topbar-rechts">
+      <a class="back" href="../../en/#projekte">All projects</a>
+      <span class="sprache"><a href="../../cobra/" hreflang="de" lang="de">DE</a> <span aria-hidden="true">|</span> <b aria-current="true">EN</b></span>
+    </nav>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="toc" aria-label="Table of contents">
+    <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc-liste">
+      <span class="toc-label">Contents</span><span class="toc-current"></span>
+    </button>
+    <ol id="toc-liste" class="toc-liste"></ol>
+  </aside>
+
+  <main id="inhalt" class="main">
+<div class="eyebrow">
+  <span class="tag">Project 01</span>
+  <span>Robotics / Embedded</span>
+  <span class="rule"></span>
+  <span>HS Düsseldorf · 2026</span>
+</div>
+
+<div class="plate">
+  <span class="screw bl"></span><span class="screw br"></span>
+  <div class="maker">Sekuria</div>
+  <div class="model">Cobra RS</div>
+  <div class="subject">Articulated robot · 5 axes + gripper</div>
+  <div class="plate-rule"></div>
+  <div class="stamps">
+    <span>Built <b>1980s</b></span>
+    <span>Made in <b>Germany</b></span>
+    <span>Owner <b>HSD</b></span>
+    <span>Rebuilt <b>2026</b></span>
+  </div>
+</div>
+
+<p class="lead">
+  An industrial robot arm from the 1980s whose control system had been lost. During a four-week
+  internship at Hochschule Düsseldorf, I rebuilt the electronics and software from scratch.
+  Without plans or original software, I had to find out how the arm is built, choose the electronics
+  and program the control system again from the ground up.
+  In the end, <strong>the arm detected cubes with a ToF sensor, picked them up and stacked them</strong>.
+</p>
+
+<figure class="hoch">
+  <div class="video-embed hoch">
+    <iframe src="https://www.youtube-nocookie.com/embed/de154ew-ZF0" title="Cobra Showcase" loading="lazy"
+      allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen
+      referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  <figcaption>Homing, web interface, digital twin, cube search and stacking, partly at 2× or 3× speed.</figcaption>
+</figure>
+
+<section>
+  <h2 id="starting-point">Starting point</h2>
+
+  <p>
+    The Cobra RS is a robot arm made by Sekuria in the 1980s. It belongs to Hochschule Düsseldorf
+    (HSD), a university of applied sciences. The mechanics were complete, and the six Philips ID35
+    steppers were still installed and wired. The control system, however, was missing completely:
+    no drivers, no controller and no original documentation. The arm could not move.
+  </p>
+  <p>
+    I did the four-week internship as part of my vocational training at the Lore-Lorentz-Schule. I was
+    supervised by Prof. Ralf Beck and Mario Meilchen in the Department of Electrical Engineering and
+    Information Technology. I had chosen the project together with them during an earlier visit to the
+    HSD. My task was to choose the hardware, wire it and write the firmware myself, until the arm moved
+    again and could be controlled through different interfaces. Because there was no documentation
+    left, I had to work out and measure a lot of things on the arm itself.
+  </p>
+
+  <div class="bildpaar-wrap">
+    <div class="bildpaar">
+      <figure>
+        <img src="../../cobra/bilder/ausgangszustand.webp" alt="Orange Cobra RS robot arm on a black base plate, loose motor cables hanging out of the base, an emergency stop button next to it" loading="lazy">
+        <figcaption>The Cobra RS without a control system: the motor cables hang out of the base.</figcaption>
+      </figure>
+      <figure>
+        <img src="../../cobra/bilder/motor-id35.webp" alt="Label of a Philips stepper motor: Stepping Motor ID35, 9904 112 35014, Step angle 7°30'" loading="lazy">
+        <figcaption>One of the six Philips ID35: 7°30' per step, so 48 steps per revolution.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2 id="understanding-the-mechanics">Understanding the mechanics</h2>
+
+  <p>
+    Before I could write a single line of kinematics, I had to find out how the arm works
+    mechanically. It has six steppers but only five axes of motion: the sixth motor closes the
+    gripper, and a spring opens it again.
+  </p>
+
+  <div class="axes">
+    <div class="axis">
+      <span class="j">J1</span>
+      <div class="d"><strong>Base</strong> <span>– rotates the whole arm</span><span class="role">Yaw · vertical axis</span></div>
+      <span class="mass">Base 272 mm</span>
+    </div>
+    <div class="axis">
+      <span class="j">J2</span>
+      <div class="d"><strong>Shoulder</strong> <span>– upper arm</span><span class="role">Pitch</span></div>
+      <span class="mass">L1 = 192 mm</span>
+    </div>
+    <div class="axis">
+      <span class="j">J3</span>
+      <div class="d"><strong>Elbow</strong> <span>– forearm</span><span class="role">Pitch</span></div>
+      <span class="mass">L2 = 192 mm</span>
+    </div>
+    <div class="axis">
+      <span class="j">J4·5</span>
+      <div class="d"><strong>Wrist</strong> <span>– bevel gear differential</span><span class="role">Pitch + Roll</span></div>
+      <span class="mass">L3 = 105 mm</span>
+    </div>
+    <div class="axis">
+      <span class="j">M6</span>
+      <div class="d"><strong>Gripper</strong> <span>– motor closes, spring opens</span><span class="role">no pose degree of freedom</span></div>
+      <span class="mass"></span>
+    </div>
+  </div>
+
+  <h3>Belt drive and decoupled axes</h3>
+  <p>
+    The motors are not in the joints but at the bottom of the arm. The outer joints are driven by
+    toothed belts that run along the arm segments. Because of this belt layout, the axes are
+    mechanically decoupled: every angle is measured against the horizontal and not relative to the
+    previous segment. When the shoulder moves, the hand keeps its orientation.
+  </p>
+  <p>
+    How old the belts were became clear in the second-to-last week: the shoulder belt crumbled, and
+    the others were close to it. We measured the profile (T5), and when the replacement arrived the
+    following Monday, I took the arm apart and replaced the belts.
+  </p>
+  <figure class="hoch">
+    <img src="../../cobra/bilder/riemen-oberarm.webp" alt="View into the opened upper arm: several toothed belts run in parallel from large pulleys at the bottom upwards" loading="lazy">
+    <figcaption>View into the opened upper arm: the toothed belts run from the pulleys at the shoulder up to the outer joints.</figcaption>
+  </figure>
+
+  <h3>Differential wrist</h3>
+  <p>
+    The pitch and roll of the hand are produced by both wrist motors together through a bevel gear
+    differential. If both turn in the same direction, the result is pure pitch. If they turn in
+    opposite directions, the result is pure roll. So the firmware first calculates the two motor
+    angles from the desired pitch and roll:
+  </p>
+  <div class="formel">
+    θ<sub>M4</sub> = Pitch + Roll<br>
+    θ<sub>M5</sub> = Pitch − Roll
+    <span class="hinweis">Signs determined by testing</span>
+  </div>
+  <p>
+    I found the signs by testing on the arm, because they depend on how the motors are mounted and
+    wired. There is no free yaw for the hand. Yaw only comes from rotating the base.
+  </p>
+
+  <figure class="hoch">
+    <img src="../../cobra/bilder/handgelenk.webp" alt="Wrist of the Cobra RS with visible bevel gears above the open gripper" loading="lazy">
+    <figcaption>The wrist: two motors produce pitch and roll together through bevel gears.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2 id="hardware">Hardware</h2>
+
+  <div class="tabelle">
+    <table class="daten">
+      <tr><th>Controller</th><td>Waveshare ESP32-P4-ETH, wired Ethernet</td></tr>
+      <tr><th>Driver board</th><td>Stepper board for the Odroid M1, distributes power to all drivers</td></tr>
+      <tr><th>Drivers</th><td>6× TMC2209, STEP/DIR + UART</td></tr>
+      <tr><th>Motors</th><td>Philips ID35, 12 V, 7.5°/step (48 steps/rev), bipolar</td></tr>
+      <tr><th>Power supply</th><td><span class="mono">18 V</span></td></tr>
+      <tr><th>Microstepping</th><td><span class="mono">16</span> → 768 microsteps/rev</td></tr>
+      <tr><th>Homing</th><td>optical reflective sensor (CNY70/TCRT5000 type) per joint</td></tr>
+      <tr><th>Environment sensor</th><td>VL53L1X ToF sensor on the hand, I²C</td></tr>
+    </table>
+  </div>
+
+  <p>
+    The controller is an ESP32-P4-ETH. Wired Ethernet instead of Wi-Fi was a request from the
+    university. The six TMC2209 drivers sit on a stepper board that was actually made for the
+    Odroid M1. It distributes power to all drivers, so I did not have to connect each driver
+    separately, and the wiring stayed clear. Over UART, the motor current and microstepping can be set
+    in software.
+  </p>
+  <p>
+    The ID35 are 6-wire motors. They were already wired as bipolar motors using the four outer wires,
+    so I could connect them directly to the TMC2209. Everything is powered with 18 V instead of the
+    motors' rated 12 V. The higher voltage gives more power and therefore smoother movements.
+  </p>
+  <p>
+    For the electronics, I designed a mounting frame in Fusion 360 and 3D printed it. It is screwed onto
+    the base plate of the arm. The controller, stepper board and breadboard each have a fixed place in
+    it, so everything sits firmly and nothing lies loose on the table.
+  </p>
+
+  <div class="bildpaar-wrap">
+    <div class="bildpaar">
+      <figure>
+        <img src="../../cobra/bilder/rahmen-cad.webp" alt="Screen with Fusion 360: design of a flat frame with two vertical supports and a plate for a board" loading="lazy">
+        <figcaption>The mounting frame in Fusion 360.</figcaption>
+      </figure>
+      <figure>
+        <img src="../../cobra/bilder/elektronik.webp" alt="Electronics on the base plate: ESP32-P4 board, breadboard and a vertically mounted stepper board with blue heat sinks, connected with many colourful jumper wires" loading="lazy">
+        <figcaption>The printed frame in use: ESP32-P4 and the stepper board with the six TMC2209.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2 id="key-decisions">Key decisions</h2>
+
+  <h3>Step generation</h3>
+  <p>
+    A stepper only moves when it gets one pulse for every step. With 16 microsteps, that is 768 pulses
+    per motor revolution, and the time between them has to be even, otherwise the motor runs roughly.
+    The FastAccelStepper library does not create these pulses in software but with the RMT module of
+    the ESP32. These are separate hardware units that send out the pulses on their own while the
+    processor does other work.
+  </p>
+  <p>
+    The plan was to drive all six motors this way. But the error messages showed that only four RMT
+    channels were available to me on the ESP32-P4. So I split the motors: motors 1 to 3 and the gripper
+    motor 6 run hardware-timed through FastAccelStepper. The two wrist motors 4 and 5 are driven by
+    AccelStepper, which creates the pulses in software in its own FreeRTOS task. The wrist does not
+    need to move or react quickly, so it was the best place to do without the hardware. The downside
+    is visible on the arm: the wrist axes move more slowly than the others. So that the rest of the
+    firmware does not need to know which library is behind a motor, I wrapped both in shared functions.
+  </p>
+  <p>
+    The ESP32-P4 has two cores. The web server runs on core 0 and the motion control on core 1. This
+    way, a request to the web interface does not slow down a running movement, and a movement does not
+    block the web server.
+  </p>
+
+  <h3>Driver tuning</h3>
+  <p>
+    The TMC2209 has two operating modes. StealthChop is quiet but gives less torque at higher speeds.
+    SpreadCycle is louder and stronger. StealthChop was enough on almost all axes. Only the shoulder,
+    motor 2, lost steps when the rest of the arm was stretched forward, because it then holds the most
+    weight. For this axis, the driver therefore switches to SpreadCycle above a certain speed.
+  </p>
+  <p>
+    I set the running current to 240 mA, the value from the ID35 datasheet. In continuous operation,
+    the motors got warm. That is why the driver lowers the current to about 30 % when the motor is
+    standing still.
+  </p>
+
+  <h3>StallGuard only on the gripper</h3>
+  <p>
+    The TMC2209 can detect with StallGuard when a motor is blocked, without an extra sensor. The idea
+    was to use this to detect collisions on the arm axes. In practice, though, one of the motors kept
+    triggering, almost at random. The problem is that every axis needs a different amount of force
+    depending on the pose. A threshold that works in one position is too sensitive or not sensitive
+    enough in the next. Calibrating this for every axis and every pose would have been too much work
+    for the internship. So I switched StallGuard off on the arm axes.
+  </p>
+  <p>
+    I kept StallGuard on the gripper. There it stops the motor as soon as the resistance from the
+    gripped cube becomes too high. I found the threshold by first closing the gripper without
+    StallGuard and reading the measured values while it closed.
+  </p>
+</section>
+
+<section>
+  <h2 id="features">Features</h2>
+
+  <h3>Homing and calibration</h3>
+  <p>
+    After switching on, a stepper does not know where it is. That is why each joint has an optical
+    reflective sensor that looks at a belt pulley with a white stripe. During homing, axes 1 to 6 move
+    one after another to the edge between black and white: first fast, then a little back, and then a
+    second time slowly, which makes the reference point more accurate. The pull-up resistors needed for
+    this were originally on the old connection board, so I added 10 kΩ pull-ups to 3.3 V on the
+    breadboard.
+  </p>
+  <figure class="hoch">
+    <img src="../../cobra/bilder/homing-sensor.webp" alt="Small circuit board with a reflective sensor and a resistor, right next to a toothed pulley with a white stripe" loading="lazy">
+    <figcaption>Reflective sensor at the joint. It detects the edge of the white stripe on the belt pulley.</figcaption>
+  </figure>
+  <p>
+    I measured the angle at the reference point for the shoulder and elbow with a spirit level app:
+    33.5° above the horizontal. At first I had the sign wrong. I noticed because the arm moved in the
+    wrong direction.
+  </p>
+
+  <h3>Kinematics</h3>
+  <p>
+    I derived and programmed the forward kinematics myself. I solved the inverse kinematics with the
+    help of AI. For the position, a 3R kinematic chain of base, shoulder and elbow is enough. The
+    orientation of the hand is added through the differential mixing. The decoupled axes make the
+    calculation easier: the direction of an arm segment comes directly from its own angle and not from
+    the sum of all previous angles.
+  </p>
+  <p>
+    Two more points came up while driving the arm. So that the arm does not swing out wide or move in
+    a jerky path, the axis with the longest way moves at full speed and the others proportionally
+    slower, so that all of them arrive at the same time. The firmware also checks all angles against
+    the axis limits before any motor moves. An unreachable point is skipped instead of letting the axes
+    move out of control.
+  </p>
+
+  <h3>Web interface</h3>
+  <p>
+    A web server with a control page runs on the ESP32. With it, I give the arm a table of points that
+    it moves to one after another, move single axes directly and see the axis angles live. When moving
+    an axis directly, the page sends a heartbeat every 200 ms. If it is missing for 500 ms, the motor
+    stops. Behind the page is a REST API that other programs can use as well.
+  </p>
+  <figure>
+    <img src="../../cobra/bilder/web-interface.webp" alt="Laptop screen with the control page: on the left a table with four waypoints (X, Y, Z, Pitch, Roll, gripper), on the right buttons for start, home position, calibration, cube scan and calibration scan, plus settings for speed and acceleration" loading="lazy">
+    <figcaption>The web interface: waypoint table on the left, controls and settings on the right.</figcaption>
+  </figure>
+
+  <h3>ROS2 and digital twin</h3>
+  <p>
+    I used ROS2 for the 3D model and the cube detection. The programs run on a laptop and get their
+    data through the same REST API as the web interface. This was simpler than micro-ROS on the ESP32.
+    I designed the 3D model myself in Fusion 360, exported the single parts as COLLADA (.dae) so that
+    rviz2 shows the colours, and put them back together into a moving arm in a URDF file. It moves live
+    together with the real arm. For this, the angles are converted, because the firmware calculates
+    against the horizontal and the model relative to the previous segment.
+  </p>
+  <figure class="hoch">
+    <img src="../../cobra/bilder/rviz-zwilling.webp" alt="Laptop with rviz2 showing a 3D model of the arm in the same pose as the real arm behind it" loading="lazy">
+    <figcaption>The digital twin in rviz2 follows the pose of the real arm.</figcaption>
+  </figure>
+
+  <h3>Cube detection with the ToF sensor</h3>
+  <p>
+    A VL53L1X sits on the gripper in a mount I printed myself. It is a time-of-flight sensor that
+    measures distances by the travel time of light. I chose it because I had one at home and had
+    already experimented with it out of interest. Its field of view can be split into 4×4 zones. The
+    arm moves to four points above the table and takes a depth image with 16 values at each of them.
+  </p>
+  <p>
+    Even the empty, flat table looked like a bowl in these images, because the outer zones look at the
+    table at an angle. Instead of correcting this with trigonometry, which works badly because the
+    viewing angles of the zones are not precise, the arm first records a reference of the empty table
+    and subtracts it during the scan. What is left is only what sticks out above the table. From these
+    zones, a ROS2 program calculates the position of the cube, and then the arm moves there, grips the
+    cube and stacks it. Instead of the black cubes I used at first, I switched to white ones, because
+    they reflect the sensor's light better.
+  </p>
+  <div class="bildpaar-wrap">
+    <div class="bildpaar">
+      <figure>
+        <img src="../../cobra/bilder/tof-halterung.webp" alt="Gripper placing a white cube on a tower, above it on the wrist a black printed mount with the small sensor board" loading="lazy">
+        <figcaption>The ToF sensor in its printed mount on the wrist while the gripper puts down a cube.</figcaption>
+      </figure>
+      <figure>
+        <img src="../../cobra/bilder/tof-heatmap.webp" alt="Laptop with a 4×4 heat map, blue and purple zones at the top centre, behind it the arm with open gripper above several cubes" loading="lazy">
+        <figcaption>Live heat map of the 16 zones. Red is the table, the purple and blue zones at the top centre show a cube.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2 id="result">Result</h2>
+  <p>
+    In the end, the arm could be controlled through the web interface, and a ROS2 program on the
+    laptop took over the cube search. With the ToF sensor on the hand, the arm scans the table, detects
+    cubes, determines their position, picks them up and stacks them. With four cubes on the table, it
+    usually found three in the first run and sometimes the fourth in a second run.
+  </p>
+  <figure class="hoch">
+    <img src="../../cobra/bilder/wuerfelturm.webp" alt="The Cobra RS next to a tower of three white cubes, a fourth cube lies behind it" loading="lazy">
+    <figcaption>Three stacked cubes, the fourth is still waiting.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2 id="what-i-learned">What I learned</h2>
+  <p>
+    The most important thing I learned is that measuring and testing on the real arm is more reliable
+    than any amount of thinking it through. I assumed that only the wrist was decoupled, thought the
+    upper arm was longer than the forearm and had the sign of the home angle wrong. Each time, only
+    testing on the arm showed the mistake. It was similar with the ToF sensor: a reference image of the
+    empty table was simpler and more reliable than calculating the distortion. Calibrating is often
+    easier than calculating.
+  </p>
+  <p>
+    I learned how important an emergency stop is from the mistake in the tool length. Because of the
+    wrong sign, the gripper moved 148 mm lower than planned and straight into the table. Luckily, an
+    emergency stop button was connected to the arm.
+  </p>
+  <p>
+    In my next project, I would define more clearly at the start what the goal is and what each
+    interface should be able to do. Direct control of single axes was only added shortly before the end
+    of the internship. When I added it, the new buttons blocked themselves at first: "motor running" and
+    "program running" were one shared state, and the interface stopped the movement again after half a
+    second. Only two separate states solved this.
+  </p>
+  <p>
+    For my studies, I take away how much I am interested in mechanical design. I actually knew that
+    already, but the internship showed it to me again, with the mounting frame, the sensor mount and the
+    3D model. Here I understood belts, gear ratios and a bevel gear differential on a real machine
+    instead of only on paper.
+  </p>
+</section>
+
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer-in">
+    <span><span class="dot">◆</span>&nbsp; Tobias Liermann · Project portfolio</span>
+    <a href="../../en/#projekte">All projects</a>
+    <p class="ki-hinweis">The projects, photos and technical content are my own. The website (design and code) and the texts were created with the help of AI and checked by me.</p>
+  </div>
+</footer>
+
+<script src="../../nav.js" defer></script>
+</body>
+</html>
