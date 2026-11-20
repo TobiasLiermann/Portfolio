@@ -211,6 +211,8 @@ figure.hoch{max-width:420px}
 .video-embed{position:relative;aspect-ratio:16/9;width:100%;border-radius:4px;overflow:hidden;border:1px solid var(--line)}
 .video-embed.hoch{aspect-ratio:9/16}
 .video-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+/* Impressum: Adressblock */
+.adresse{font-style:normal;line-height:1.7}
 
 /* ---------- Entwurfs-Markierung (vor Veröffentlichung entfernen) ---------- */
 .todo{
